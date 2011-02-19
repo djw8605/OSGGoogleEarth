@@ -1,0 +1,76 @@
+
+
+<html>
+
+<head>
+<script src="https://www.google.com/jsapi?key=ABQIAAAAu0TL0A-Hx1fvzGI6gOofLxRdWR7O4-XcWvAQALHxHt_c1fTKOhSeYIt5K3vK4_YcuhTz3-irM0p_eQ"></script>
+<script type="text/javascript">
+google.load("earth", "1");
+google.setOnLoadCallback(init);
+
+function init() {
+   google.earth.createInstance('map3d', initCB, failureCB);
+}
+
+function initCB(instance) {
+   ge = instance;
+   ge.getWindow().setVisibility(true);
+   var networkLink = ge.createNetworkLink("");
+  networkLink.setDescription("OSG Job flow");
+  networkLink.setName("OSG");
+  networkLink.setFlyToView(true);
+  ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+
+  // create a Link object
+  var link = ge.createLink("");
+  link.setHref("http://viz.unl.edu/dashboard/dashb-earth-all.kml");
+  link.setRefreshInterval(60);
+  
+  networkLink.set(link, true, false);
+
+  // attach the Link to the NetworkLink
+  networkLink.setLink(link);
+
+  // add the NetworkLink feature to Earth
+  ge.getFeatures().appendChild(networkLink);
+
+  loadedKML();
+
+    
+}
+
+function loadedKML(){
+ // Slow down the clock
+    var defaultRate = 15;
+    ge.getTime().setRate(defaultRate);
+    var time=ge.getTime().getRate();
+
+    // Get the current view
+    var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+
+    // Set new latitude and longitude values
+    lookAt.setLatitude(40.83874913796459);
+    lookAt.setLongitude(-96.70166015625);
+    lookAt.setRange(4000000.0);
+
+    // Update the view in Google Earth
+    ge.getView().setAbstractView(lookAt);
+
+}
+
+
+function failureCB(errorCode) {
+}
+
+
+</script>
+</head>
+<body>
+<div id="map3d" style="height: 768px; width: 1024px;"></div>
+
+
+
+</body>
+</html>
+
+
