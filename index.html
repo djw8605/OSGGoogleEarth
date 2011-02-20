@@ -6,6 +6,8 @@
 <script src="https://www.google.com/jsapi?key=ABQIAAAAu0TL0A-Hx1fvzGI6gOofLxRdWR7O4-XcWvAQALHxHt_c1fTKOhSeYIt5K3vK4_YcuhTz3-irM0p_eQ"></script>
 <script type="text/javascript">
 google.load("earth", "1");
+google.load("jquery", "1.5.0");
+var ge;
 google.setOnLoadCallback(init);
 
 function init() {
@@ -34,17 +36,12 @@ function initCB(instance) {
   // add the NetworkLink feature to Earth
   ge.getFeatures().appendChild(networkLink);
 
-  loadedKML();
+  loadedKML(instance);
 
     
 }
 
-function loadedKML(){
- // Slow down the clock
-    var defaultRate = 15;
-    ge.getTime().setRate(defaultRate);
-    var time=ge.getTime().getRate();
-
+function loadedKML(instance){
     // Get the current view
     var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 
@@ -56,18 +53,78 @@ function loadedKML(){
     // Update the view in Google Earth
     ge.getView().setAbstractView(lookAt);
 
-}
+    // Slow down the clock
+    var defaultRate = 15;
+    ge.getTime().setRate(defaultRate);
+    var time=ge.getTime().getRate();
 
+    //setTimeout("showCurrentPluginTime()", 10*1000);
+
+
+}
+var initialtime;
+function showCurrentPluginTime(){
+   //showExtents()
+   var time = ge.getTime().getTimePrimitive();
+   initialtime = time;
+//   ge.getTime().setRate(15);
+   setTimeout("setRate()", 1*1000);
+   setTimeout("resetTime()", 15*1000);
+/*
+   if (time.getType() == 'KmlTimeSpan') {
+      alert('TimeSpan from ' + time.getBegin().get()
+          + ' to ' + time.getEnd().get());
+   } else {
+      alert('TimeStamp at ' + time.getWhen().get());
+   }
+*/
+}
 
 function failureCB(errorCode) {
 }
 
+function resetTime(){
+    //ge.getTime().setTimePrimitive(initialtime);
+    ge.getTime().setTimePrimitive(initialtime);
+    setTimeout("setRate()", 1*1000);
+    
+    // 10 minutes, 15 seconds for each second.  (10*60)/15
+    setTimeout("resetTime()", ((10*60)/15)*1000);
+}
+
+function setRate(){
+    ge.getTime().setRate(15);
+}
+function showExtents() {
+   var extents = ge.getTime().getControl().getExtents();
+   var begin = extents.getBegin().get();
+   if (initialtime != extents.getBegin().get()) {
+      initialtime = extents.getBegin().get();
+   }
+   var timeStamp = ge.createTimeStamp('');
+   timeStamp.getWhen().set(initialtime);
+   ge.getTime().setTimePrimitive(timeStamp);
+   setTimeout("setRate()", 1*1000);
+   setTimeout("showExtents()", ((10*60)/15)*1000);
+   //var begin = extents.getBegin().get();
+   //var end = extents.getEnd().get();
+   //alert("Begin: " + begin + "\n"
+   //    + "End:   " + end);
+}
+
+function GetRate() {
+    $("#rate").html(ge.getTime().getRate());
+    ge.getTime().setRate(15);
+
+}
 
 </script>
 </head>
 <body>
 <div id="map3d" style="height: 768px; width: 1024px;"></div>
-
+<input type="button" onclick="GetRate()" value="Get Rate"/>
+<div id="rate"></div>
+<input type="button" onclick="showCurrentPluginTime()" value="Show Plugin Time"/>
 
 
 </body>
