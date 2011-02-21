@@ -8,16 +8,57 @@
 google.load("earth", "1");
 google.load("jquery", "1.5.0");
 var ge;
+var vos_to_kml;
 google.setOnLoadCallback(init);
+
 
 function init() {
    google.earth.createInstance('map3d', initCB, failureCB);
+   initializeVOs();
 }
 
+function initializeVOs() {
+
+    // Initialize
+    vos_to_kml = new Array();
+    vos_to_kml["All VOs"] = "http://viz.unl.edu/dashboard/dashb-earth-all.kml"
+    vos_to_kml["HCC"] = "http://viz.unl.edu/dashboard/dashb-earth-hcc.kml"
+    vos_to_kml["Engage"] = "http://viz.unl.edu/dashboard/dashb-earth-engage.kml"
+    vos_to_kml["SBGrid"] = "http://viz.unl.edu/dashboard/dashb-earth-sbgrid.kml"
+    vos_to_kml["DZero"] = "http://viz.unl.edu/dashboard/dashb-earth-dzero.kml"
+    vos_to_kml["Ligo"] = "http://viz.unl.edu/dashboard/dashb-earth-ligo.kml"
+
+    // Populate the drop down box
+    for (key in vos_to_kml)
+    {
+        $("#vos").append("<option value=\"" + key + "\">" + key + "</option>");
+    }
+
+}
+
+
+function VOsChange() {
+    // Get the value
+    var selected_vo = $("#vos").attr("value");
+    
+    // Get the url
+    var selected_url = vos_to_kml[selected_vo];
+
+    // Update the plugin
+    var link = ge.createLink(selected_vo);
+    link.setHref(selected_url);
+    link.setRefreshInterval(60);
+    networkLink.set(link, true, false);
+    networkLink.setLink(link);
+
+
+}
+
+var networkLink;
 function initCB(instance) {
    ge = instance;
    ge.getWindow().setVisibility(true);
-   var networkLink = ge.createNetworkLink("");
+   networkLink = ge.createNetworkLink("");
   networkLink.setDescription("OSG Job flow");
   networkLink.setName("OSG");
   networkLink.setFlyToView(true);
@@ -121,10 +162,14 @@ function GetRate() {
 </script>
 </head>
 <body>
-<div id="map3d" style="height: 768px; width: 1024px;"></div>
-<input type="button" onclick="GetRate()" value="Get Rate"/>
-<div id="rate"></div>
-<input type="button" onclick="showCurrentPluginTime()" value="Show Plugin Time"/>
+<div id="map3d" style="height: 600px; width: 1024px;"></div>
+<!-- <input type="button" onclick="GetRate()" value="Get Rate"/> -->
+<div id="option-pannel">
+Displayed VO's:
+<select name="vos" id="vos" onchange="VOsChange()">
+</select>
+<input type="button" onclick="showCurrentPluginTime()" value="Start Animation"/>
+</div>
 
 
 </body>
